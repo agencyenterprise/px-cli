@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 
-import { findProjectRootDirectory } from './find-project-root-directory.js'
+import { getProjectRootDirectory } from './get-project-root-directory.js'
 
 /** @typedef {"npm" | "pnpm" | "yarn"} PackageManager */
 
@@ -19,7 +19,7 @@ import { findProjectRootDirectory } from './find-project-root-directory.js'
  */
 export async function detectPackageManager() {
   /** @type {PackageManager | null} */
-  const rootDirectory = await findProjectRootDirectory()
+  const rootDirectory = await getProjectRootDirectory()
 
   if (rootDirectory) {
     const files = await fs.readdir(rootDirectory)
