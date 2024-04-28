@@ -5,6 +5,8 @@ import { detectPackageManager } from '../utils/package-manager.js'
 import { isTypeScriptProject } from '../utils/project.js'
 import { composeDeclarationPackageName } from '../utils/typescript.js'
 
+const DEV_FLAGS = ['-D', '--dev', '--save-dev']
+
 /**
  * Install packages.
  *
@@ -23,11 +25,17 @@ export async function installCommand(program) {
   const packages = program.args.slice(1).filter((arg) => !arg.startsWith('-'))
   const declarationPackages = await getTypeScriptDeclarationPackages(packages)
 
-  // TODO If installing dev dependencies install everything in one command
-  const installCommand = `${packageManager} ${program.args.join(' ')}`
+  const isDevInstall = DEV_FLAGS.some((flag) => program.args.includes(flag))
+  let installCommand = `${packageManager} ${program.args.join(' ')}`
+
+  // Install declaration packages in the same command if it's installing dev dependencies
+  if (isDevInstall && declarationPackages.length > 0) {
+    installCommand += ` ${declarationPackages.join(' ')}`
+  }
+
   executeCommand(installCommand)
 
-  if (declarationPackages.length > 0) {
+  if (!isDevInstall && declarationPackages.length > 0) {
     const baseCommand = program.args[0]
     const declarationsCommand = `${packageManager} ${baseCommand} -D ${declarationPackages.join(' ')}`
     executeCommand(declarationsCommand)
