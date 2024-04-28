@@ -38,7 +38,10 @@ export async function uninstallCommand(program) {
       }
 
       const declarationPkg = composeDeclarationPackageName(pkg)
-      if (dependencies.includes(declarationPkg)) {
+      if (
+        dependencies.includes(declarationPkg) &&
+        !packages.includes(declarationPkg)
+      ) {
         packagesToUninstall.push(declarationPkg)
       }
     }
