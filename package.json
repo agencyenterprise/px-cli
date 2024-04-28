@@ -1,6 +1,13 @@
 {
   "name": "pxcli",
   "version": "0.0.1",
-  "scripts": {},
-  "license": "MIT"
+  "scripts": {
+    "prepare": "husky"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "husky": "^9.0.11"
+  }
 }
