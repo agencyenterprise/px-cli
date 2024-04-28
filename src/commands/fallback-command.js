@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 
-import { detectPackageManager } from '../detect-package-manager.js'
 import { executeCommand } from '../execute-command.js'
+import { detectPackageManager } from '../utils/package-manager.js'
 
 /**
  * Fallback command to forward the command to the detected package manager.
@@ -14,10 +14,6 @@ export async function fallbackCommand(program) {
     return console.error(chalk.red('Package manager not found!'))
   }
 
-  try {
-    const command = `${packageManager} ${program.args.join(' ')}`
-    executeCommand(command)
-  } catch {
-    // Error is resolved by the package manager
-  }
+  const command = `${packageManager} ${program.args.join(' ')}`
+  executeCommand(command)
 }

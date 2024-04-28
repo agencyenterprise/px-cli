@@ -20,6 +20,15 @@ program
   .allowUnknownOption()
   .action(() => installCommand(program))
 
+// program
+//   .command('uninstall <packages...>')
+//   .description('uninstall packages')
+//   .alias('un')
+//   .alias('remove')
+//   .alias('rm')
+//   .allowUnknownOption()
+//   .action(() => uninstallCommand(program))
+
 program
   .command('* <command>')
   .description('forward the command to the package manager')

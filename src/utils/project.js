@@ -1,8 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-// List of lock files to look for in the project root directory
-const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml']
+import { lockFiles } from './package-manager.js'
 
 /**
  * Get the project root directory.
@@ -38,7 +37,32 @@ export async function getProjectRootDirectory() {
   return null
 }
 
-// * Get the project root directory by looking for the `package.json` file.
-//  *
-//  * The search starts from the current working directory and goes up to the root directory.
-//  * If the `package.json` file is not found it will return null.
+/**
+ * Check if the project is a TypeScript project.
+ *
+ * This function checks if the project is a TypeScript project by looking for a
+ * `tsconfig.json` file in the project (or package) directory.
+ *
+ * **NOTE:** We can't use the `getProjectRootDirectory` function because when
+ * working in monorepos the root directory might not have a `tsconfig.json` file.
+ * The file will probably be in the package directory.
+ *
+ * @returns {Promise<boolean>}
+ */
+export async function isTypeScriptProject() {
+  let currentDir = process.cwd()
+
+  while (currentDir !== path.parse(currentDir).root) {
+    const hasTSConfig = await fs
+      .stat(path.join(currentDir, 'tsconfig.json'))
+      .catch(() => null)
+
+    if (hasTSConfig) {
+      return true
+    }
+
+    currentDir = path.dirname(currentDir)
+  }
+
+  return false
+}

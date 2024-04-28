@@ -1,6 +1,9 @@
 import fs from 'node:fs/promises'
 
-import { getProjectRootDirectory } from './get-project-root-directory.js'
+import { getProjectRootDirectory } from './project.js'
+
+/** List of lock files to determine the package manager. */
+export const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml']
 
 /** @typedef {"npm" | "pnpm" | "yarn"} PackageManager */
 

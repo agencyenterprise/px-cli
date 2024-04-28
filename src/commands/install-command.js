@@ -1,17 +1,16 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
-
 import chalk from 'chalk'
 
-import { detectPackageManager } from '../detect-package-manager.js'
 import { executeCommand } from '../execute-command.js'
-import { getProjectRootDirectory } from '../get-project-root-directory.js'
+import { detectPackageManager } from '../utils/package-manager.js'
+import { isTypeScriptProject } from '../utils/project.js'
+import { composeDeclarationPackageName } from '../utils/typescript.js'
 
 /**
  * Install packages.
  *
- * This function installs the packages using the package manager and installs the
- * TypeScript declaration packages for the packages being installed.
+ * This function installs the packages using the detected package manager. It
+ * also installs the TypeScript declaration packages for the installed packages
+ * if the project is a TypeScript project.
  *
  * @param {import('commander').Command} program
  */
@@ -24,18 +23,14 @@ export async function installCommand(program) {
   const packages = program.args.slice(1).filter((arg) => !arg.startsWith('-'))
   const declarationPackages = await getTypeScriptDeclarationPackages(packages)
 
-  try {
-    // TODO If installing dev dependencies install everything in one command
-    const installCommand = `${packageManager} ${program.args.join(' ')}`
-    executeCommand(installCommand)
+  // TODO If installing dev dependencies install everything in one command
+  const installCommand = `${packageManager} ${program.args.join(' ')}`
+  executeCommand(installCommand)
 
-    if (declarationPackages.length > 0) {
-      const baseCommand = program.args[0]
-      const declarationsCommand = `${packageManager} ${baseCommand} -D ${declarationPackages.join(' ')}`
-      executeCommand(declarationsCommand)
-    }
-  } catch {
-    // Errors are resolved by the package manager
+  if (declarationPackages.length > 0) {
+    const baseCommand = program.args[0]
+    const declarationsCommand = `${packageManager} ${baseCommand} -D ${declarationPackages.join(' ')}`
+    executeCommand(declarationsCommand)
   }
 }
 
@@ -75,44 +70,4 @@ async function getTypeScriptDeclarationPackages(packages) {
   }
 
   return []
-}
-
-/**
- * Check if the project is a TypeScript project.
- *
- * This function checks if the project is a TypeScript project by looking for a
- * `tsconfig.json` file in the project root directory.
- *
- * @returns {Promise<boolean>}
- */
-async function isTypeScriptProject() {
-  const rootDirectory = await getProjectRootDirectory()
-  const tsConfigPath = path.join(rootDirectory, 'tsconfig.json')
-
-  try {
-    await fs.access(tsConfigPath)
-    return true
-  } catch {
-    return false
-  }
-}
-
-/**
- * Compose the TypeScript declaration package name, according to the DefinitelyTyped
- * [naming convention](https://github.com/DefinitelyTyped/DefinitelyTyped#npm).
- *
- * For example:
- * - `react` -> `@types/react`
- * - `@babel/preset-env` -> `@types/babel__preset-env`
- *
- * @param {string} pkg
- * @returns string
- */
-function composeDeclarationPackageName(pkg) {
-  if (pkg.startsWith('@')) {
-    const [scope, name] = pkg.slice(1).split('/')
-    return `@types/${scope}__${name}`
-  }
-
-  return `@types/${pkg}`
 }
