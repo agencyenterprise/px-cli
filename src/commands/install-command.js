@@ -1,10 +1,10 @@
-import { execSync } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import chalk from 'chalk'
 
 import { detectPackageManager } from '../detect-package-manager.js'
+import { executeCommand } from '../execute-command.js'
 import { getProjectRootDirectory } from '../get-project-root-directory.js'
 
 /**
@@ -26,18 +26,17 @@ export async function installCommand(program) {
 
   try {
     // TODO If installing dev dependencies install everything in one command
-    execSync(`${packageManager} ${program.args.join(' ')}`, {
-      stdio: 'inherit',
-    })
+    const installCommand = `${packageManager} ${program.args.join(' ')}`
+    executeCommand(installCommand)
 
     if (declarationPackages.length > 0) {
-      const command = program.args[0]
-      execSync(
-        `${packageManager} ${command} -D ${declarationPackages.join(' ')}`,
-        { stdio: 'inherit' },
-      )
+      const baseCommand = program.args[0]
+      const declarationsCommand = `${packageManager} ${baseCommand} -D ${declarationPackages.join(' ')}`
+      executeCommand(declarationsCommand)
     }
-  } catch {}
+  } catch {
+    // Errors are resolved by the package manager
+  }
 }
 
 /**

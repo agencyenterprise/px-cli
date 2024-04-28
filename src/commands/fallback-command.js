@@ -1,8 +1,7 @@
-import { execSync } from 'node:child_process'
-
 import chalk from 'chalk'
 
 import { detectPackageManager } from '../detect-package-manager.js'
+import { executeCommand } from '../execute-command.js'
 
 /**
  * Fallback command to forward the command to the detected package manager.
@@ -15,9 +14,9 @@ export async function fallbackCommand(program) {
     return console.error(chalk.red('Package manager not found!'))
   }
 
-  const command = program.args.join(' ')
   try {
-    execSync(`${packageManager} ${command}`, { stdio: 'inherit' })
+    const command = `${packageManager} ${program.args.join(' ')}`
+    executeCommand(command)
   } catch {
     // Error is resolved by the package manager
   }
