@@ -49,19 +49,24 @@ export async function installCommand(program) {
  */
 async function getTypeScriptDeclarationPackages(packages) {
   if (await isTypeScriptProject()) {
-    /** @type {string[]} */
     const declarationPackages = []
 
     for (const pkg of packages) {
-      const declarationPkg = composeDeclarationPackageName(pkg)
+      if (pkg.startsWith('@types')) {
+        continue
+      }
 
       // Check if the declaration package exists in the npm registry. It will
       // return a 404 if the package does not exist.
+      // TODO Add a cache to avoid making multiple requests for the same package
+      console.debug(chalk.gray(`Checking if ${pkg} has a declaration package`))
+      const declarationPkg = composeDeclarationPackageName(pkg)
       const response = await fetch(
         `https://registry.npmjs.org/${declarationPkg}`,
       )
 
       if (response.ok) {
+        console.debug(chalk.green(`Found declaration package for ${pkg}`))
         declarationPackages.push(declarationPkg)
       }
     }

@@ -4,17 +4,28 @@ import path from 'node:path'
 import { lockFiles } from './package-manager.js'
 
 /**
+ * @typedef {{
+ *  ignoreLockFile?: boolean
+ * }} GetProjectRootDirectoryOptions
+ */
+
+/**
  * Get the project root directory.
  *
- * It will look for the project root directory by checking the existence of a `package.json`
- * file and one of the lock files in the directory.
+ * It will look for the project root directory by checking the existence of a
+ * `package.json` file and one of the lock files in the directory.
  *
  * The search starts from the current working directory and goes up to the
- * directory. If the project root directory is not found it returns null.
+ * directory. If the root directory is not found it returns null.
  *
+ * Optionally, it can ignore the lock file and return the first directory with a
+ * `package.json`. This is useful when the lock file is not needed. For example,
+ * when listing the installed packages.
+ *
+ * @param {GetProjectRootDirectoryOptions | undefined} options
  * @returns {Promise<string | null>}
  */
-export async function getProjectRootDirectory() {
+export async function getProjectRootDirectory(options) {
   let currentDir = process.cwd()
 
   while (currentDir !== path.parse(currentDir).root) {
@@ -26,7 +37,7 @@ export async function getProjectRootDirectory() {
       const files = await fs.readdir(currentDir)
       const hasLockFile = lockFiles.some((filename) => files.includes(filename))
 
-      if (hasLockFile) {
+      if (hasLockFile || options?.ignoreLockFile) {
         return currentDir
       }
     }
