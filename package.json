@@ -1,13 +1,17 @@
 {
   "name": "pxcli",
   "version": "0.0.1",
+  "license": "MIT",
+  "type": "module",
   "scripts": {
     "prepare": "husky"
   },
-  "license": "MIT",
   "devDependencies": {
-    "@commitlint/cli": "^19.3.0",
-    "@commitlint/config-conventional": "^19.2.2",
-    "husky": "^9.0.11"
+    "@commitlint/cli": "19.3.0",
+    "@commitlint/config-conventional": "19.2.2",
+    "@rocketseat/eslint-config": "2.2.2",
+    "eslint": "8",
+    "eslint-plugin-simple-import-sort": "12.1.0",
+    "husky": "9.0.11"
   }
 }
