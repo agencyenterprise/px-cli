@@ -10,11 +10,6 @@ import { getProjectRootDirectory } from './get-project-root-directory.js'
  * The package manager is detected by the name of the lock file in the project root directory.
  * If the lock file is not found it will return null.
  *
- * The supported package managers are:
- * - npm
- * - yarn
- * - pnpm
- *
  * @returns {Promise<PackageManager | null>}
  */
 export async function detectPackageManager() {
