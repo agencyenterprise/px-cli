@@ -11,7 +11,7 @@ const program = new Command()
 
 program
   .name('px')
-  .description('Package manager helper for JavaScript projects')
+  .description('Package manager executor for JavaScript projects')
   .version(pkgMetadata.version)
 
 program
