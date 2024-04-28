@@ -1,9 +1,10 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --no-warnings=ExperimentalWarning
 import { execSync } from 'node:child_process'
 
 import chalk from 'chalk'
 import { Command } from 'commander'
 
+import pkgMetadata from '../package.json' with { type: 'json' }
 import { detectPackageManager } from './detect-package-manager.js'
 
 const program = new Command()
@@ -11,7 +12,7 @@ const program = new Command()
 program
   .name('px')
   .description('Package manager helper for JavaScript projects')
-  .version('0.0.1')
+  .version(pkgMetadata.version)
 
 program
   .command('* <command>')
