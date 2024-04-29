@@ -56,6 +56,7 @@ export async function installCommand(program) {
  * @returns {Promise<string[]>}
  */
 async function getTypeScriptDeclarationPackages(packages) {
+  // TODO Do multiple requests at once: Promise.all
   if (await isTypeScriptProject()) {
     const declarationPackages = []
 
@@ -64,18 +65,12 @@ async function getTypeScriptDeclarationPackages(packages) {
         continue
       }
 
-      // Check if the declaration package exists in the npm registry. It will
-      // return a 404 if the package does not exist.
       // TODO Add a cache to avoid making multiple requests for the same package
       // https://www.npmjs.com/package/configstore
-      // TODO Don't install types if it's deprecated (.e.g dotenv)
       console.debug(chalk.gray(`Checking if ${pkg} has a declaration package`))
       const declarationPkg = composeDeclarationPackageName(pkg)
-      const response = await fetch(
-        `https://registry.npmjs.org/${declarationPkg}`,
-      )
 
-      if (response.ok) {
+      if (await isPackageOnRegistry(declarationPkg)) {
         console.debug(chalk.green(`Found declaration package for ${pkg}`))
         declarationPackages.push(declarationPkg)
       }
@@ -85,4 +80,31 @@ async function getTypeScriptDeclarationPackages(packages) {
   }
 
   return []
+}
+
+/**
+ * Check if package is available on the npm registry.
+ *
+ * It returns whether the package is available on the npm registry or not. It
+ * also checks if the package is deprecated.
+ *
+ * @param {String} packageName
+ * @returns {Promise<boolean>}
+ */
+async function isPackageOnRegistry(packageName) {
+  const response = await fetch(`https://registry.npmjs.org/${packageName}`)
+  if (!response.ok) {
+    return false
+  }
+
+  // Verify if package is not deprecated (e.g. @types/dotenv)
+  const { versions = {} } = await response.json()
+  const latestVersion = Object.keys(versions).pop()
+  const isDeprecated = !!versions[latestVersion].deprecated
+
+  if (isDeprecated) {
+    return false
+  }
+
+  return true
 }
