@@ -67,6 +67,8 @@ async function getTypeScriptDeclarationPackages(packages) {
       // Check if the declaration package exists in the npm registry. It will
       // return a 404 if the package does not exist.
       // TODO Add a cache to avoid making multiple requests for the same package
+      // https://www.npmjs.com/package/configstore
+      // TODO Don't install types if it's deprecated (.e.g dotenv)
       console.debug(chalk.gray(`Checking if ${pkg} has a declaration package`))
       const declarationPkg = composeDeclarationPackageName(pkg)
       const response = await fetch(

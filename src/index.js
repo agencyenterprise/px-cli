@@ -14,6 +14,7 @@ program
   .description('Package manager executor for JavaScript projects')
   .version(pkgMetadata.version)
 
+// BUG It's possible no packages are provided, if the user is just installing the dependencies in package.json
 program
   .command('install <packages...>')
   .description('install packages')
