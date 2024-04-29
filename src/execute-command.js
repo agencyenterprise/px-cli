@@ -12,7 +12,7 @@ import chalk from 'chalk'
  */
 export function executeCommand(command) {
   try {
-    console.log(chalk.gray(`\n$ ${command}\n`))
+    console.log(chalk.gray(`$ ${command}`))
     execSync(command, { stdio: 'inherit' })
   } catch {
     // Errors are resolved by the package manager
