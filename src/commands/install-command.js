@@ -1,9 +1,10 @@
 import chalk from 'chalk'
+import _ from 'lodash'
 
 import { executeCommand } from '../execute-command.js'
 import { detectPackageManager } from '../utils/package-manager.js'
 import { isTypeScriptProject } from '../utils/project.js'
-import { composeDeclarationPackageName } from '../utils/typescript.js'
+import { composeTypesPackageName } from '../utils/typescript.js'
 
 const DEV_FLAGS = ['-D', '--dev', '--save-dev']
 
@@ -11,8 +12,8 @@ const DEV_FLAGS = ['-D', '--dev', '--save-dev']
  * Install packages.
  *
  * This function installs the packages using the detected package manager. It
- * also installs the TypeScript declaration packages for the installed packages
- * if the project is a TypeScript project.
+ * also installs the TypeScript types declaration packages for the installed
+ * packages if the project is a TypeScript project.
  *
  * @param {import('commander').Command} program
  */
@@ -23,12 +24,12 @@ export async function installCommand(program) {
   }
 
   const packages = program.args.slice(1).filter((arg) => !arg.startsWith('-'))
-  const declarationPackages = await getTypeScriptDeclarationPackages(packages)
+  const declarationPackages = await getTypeScriptTypesPackages(packages)
 
   const isDevInstall = DEV_FLAGS.some((flag) => program.args.includes(flag))
   let installCommand = `${packageManager} ${program.args.join(' ')}`
 
-  // Install declaration packages in the same command if it's installing dev dependencies
+  // Install types declaration packages in the same command if it's installing dev dependencies
   if (isDevInstall && declarationPackages.length > 0) {
     installCommand += ` ${declarationPackages.join(' ')}`
   }
@@ -43,40 +44,39 @@ export async function installCommand(program) {
 }
 
 /**
- * Get TypeScript declaration packages to be installed.
+ * Get TypeScript types declaration packages to be installed.
  *
- * On TypeScript projects, we need to install the TypeScript declaration packages
- * for the packages being installed. This function will return the list of
- * TypeScript declaration packages that need to be installed.
+ * On TypeScript projects, we need to install the TypeScript types declaration
+ * packages for the packages being installed. This function will return the list
+ * of declaration packages that need to be installed.
  *
- * If the project is not a TypeScript project, it returns an empty array to skip
+ * If the project does not use TypeScript, it returns an empty array to skip
  * this step.
  *
  * @param {string[]} packages
  * @returns {Promise<string[]>}
  */
-async function getTypeScriptDeclarationPackages(packages) {
-  // TODO Do multiple requests at once: Promise.all
+async function getTypeScriptTypesPackages(packages) {
   if (await isTypeScriptProject()) {
-    const declarationPackages = []
+    // TODO Add a cache to avoid making multiple requests for the same package
+    // https://www.npmjs.com/package/configstore
+    const typesPackages = await Promise.all(
+      _.uniq(packages).map(async (pkg) => {
+        if (!pkg.startsWith('@types')) {
+          console.debug(chalk.gray(`Checking if ${pkg} has a types package`))
+          const typesPackage = composeTypesPackageName(pkg)
 
-    for (const pkg of packages) {
-      if (pkg.startsWith('@types')) {
-        continue
-      }
+          if (await isPackageOnRegistry(typesPackage)) {
+            console.debug(chalk.green(`Found types package for ${pkg}`))
+            return typesPackage
+          }
+        }
 
-      // TODO Add a cache to avoid making multiple requests for the same package
-      // https://www.npmjs.com/package/configstore
-      console.debug(chalk.gray(`Checking if ${pkg} has a declaration package`))
-      const declarationPkg = composeDeclarationPackageName(pkg)
+        return null
+      }),
+    )
 
-      if (await isPackageOnRegistry(declarationPkg)) {
-        console.debug(chalk.green(`Found declaration package for ${pkg}`))
-        declarationPackages.push(declarationPkg)
-      }
-    }
-
-    return declarationPackages
+    return typesPackages.filter(Boolean)
   }
 
   return []

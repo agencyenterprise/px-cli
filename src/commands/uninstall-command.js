@@ -3,13 +3,14 @@ import chalk from 'chalk'
 import { executeCommand } from '../execute-command.js'
 import { detectPackageManager } from '../utils/package-manager.js'
 import { getProjectPackageJson, isTypeScriptProject } from '../utils/project.js'
-import { composeDeclarationPackageName } from '../utils/typescript.js'
+import { composeTypesPackageName } from '../utils/typescript.js'
 
 /**
  * Uninstall packages from the project.
  *
  * Uninstall the packages from the project using the package manager. If the
- * project is a TypeScript project it will also remove the declaration packages.
+ * project is a TypeScript project it will also remove the types declaration
+ * packages.
  *
  * @param {import('commander').Command} program
  */
@@ -22,7 +23,7 @@ export async function uninstallCommand(program) {
   const packages = program.args.slice(1).filter((arg) => !arg.startsWith('-'))
   const packagesToUninstall = []
 
-  // Remove declaration packages if the project is a TypeScript project
+  // Remove types declaration packages if the project uses TypeScript
   if (await isTypeScriptProject()) {
     const dependencies = await listProjectDependencies()
 
@@ -31,12 +32,9 @@ export async function uninstallCommand(program) {
         continue
       }
 
-      const declarationPkg = composeDeclarationPackageName(pkg)
-      if (
-        dependencies.includes(declarationPkg) &&
-        !packages.includes(declarationPkg)
-      ) {
-        packagesToUninstall.push(declarationPkg)
+      const typesPkg = composeTypesPackageName(pkg)
+      if (dependencies.includes(typesPkg) && !packages.includes(typesPkg)) {
+        packagesToUninstall.push(typesPkg)
       }
     }
   }
