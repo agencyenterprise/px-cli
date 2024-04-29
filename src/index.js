@@ -14,9 +14,8 @@ program
   .description('Package manager executor for JavaScript projects')
   .version(pkgMetadata.version)
 
-// BUG It's possible no packages are provided, if the user is just installing the dependencies in package.json
 program
-  .command('install <packages...>')
+  .command('install [packages...]')
   .description('install packages')
   .alias('i')
   .alias('add')
@@ -24,7 +23,7 @@ program
   .action(() => installCommand(program))
 
 program
-  .command('uninstall <packages...>')
+  .command('uninstall [packages...]')
   .description('uninstall packages')
   .alias('un')
   .alias('remove')
