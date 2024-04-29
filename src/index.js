@@ -1,7 +1,7 @@
 #!/usr/bin/env node --no-warnings=ExperimentalWarning
 import { Command } from 'commander'
 
-import pkgMetadata from '../package.json' with { type: 'json' }
+import packageJson from '../package.json' with { type: 'json' }
 import { fallbackCommand } from './commands/fallback-command.js'
 import { installCommand } from './commands/install-command.js'
 import { uninstallCommand } from './commands/uninstall-command.js'
@@ -12,7 +12,7 @@ const program = new Command()
 program
   .name('px')
   .description('Package manager eXecutor for JavaScript projects.')
-  .version(pkgMetadata.version)
+  .version(packageJson.version)
 
 program
   .command('install [packages...]')

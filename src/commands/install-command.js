@@ -1,6 +1,7 @@
 import chalk from 'chalk'
 import _ from 'lodash'
 
+import { config } from '../config.js'
 import { executeCommand } from '../execute-command.js'
 import { detectPackageManager } from '../utils/package-manager.js'
 import { isTypeScriptProject } from '../utils/project.js'
@@ -24,21 +25,21 @@ export async function installCommand(program) {
   }
 
   const packages = program.args.slice(1).filter((arg) => !arg.startsWith('-'))
-  const declarationPackages = await getTypeScriptTypesPackages(packages)
+  const typesPackages = await getTypeScriptTypesPackages(_.uniq(packages))
 
   const isDevInstall = DEV_FLAGS.some((flag) => program.args.includes(flag))
   let installCommand = `${packageManager} ${program.args.join(' ')}`
 
   // Install types declaration packages in the same command if it's installing dev dependencies
-  if (isDevInstall && declarationPackages.length > 0) {
-    installCommand += ` ${declarationPackages.join(' ')}`
+  if (isDevInstall && typesPackages.length > 0) {
+    installCommand += ` ${typesPackages.join(' ')}`
   }
 
   executeCommand(installCommand)
 
-  if (!isDevInstall && declarationPackages.length > 0) {
+  if (!isDevInstall && typesPackages.length > 0) {
     const baseCommand = program.args[0]
-    const declarationsCommand = `${packageManager} ${baseCommand} -D ${declarationPackages.join(' ')}`
+    const declarationsCommand = `${packageManager} ${baseCommand} -D ${typesPackages.join(' ')}`
     executeCommand(declarationsCommand)
   }
 }
@@ -58,25 +59,58 @@ export async function installCommand(program) {
  */
 async function getTypeScriptTypesPackages(packages) {
   if (await isTypeScriptProject()) {
-    // TODO Add a cache to avoid making multiple requests for the same package
-    // https://www.npmjs.com/package/configstore
-    const typesPackages = await Promise.all(
-      _.uniq(packages).map(async (pkg) => {
-        if (!pkg.startsWith('@types')) {
-          console.debug(chalk.gray(`Checking if ${pkg} has a types package`))
-          const typesPackage = composeTypesPackageName(pkg)
+    /** @type {string[]} */
+    const packagesWithTypes = config.get('packagesWithTypes')
 
-          if (await isPackageOnRegistry(typesPackage)) {
-            console.debug(chalk.green(`Found types package for ${pkg}`))
-            return typesPackage
-          }
+    /** @type {string[]} */
+    const packagesWithoutTypes = config.get('packagesWithoutTypes')
+
+    /** @type {[string, string | null][]} */
+    const verifiedPackages = await Promise.all(
+      packages.map(async (pkgName) => {
+        if (pkgName.startsWith('@types')) {
+          // Return null to don't include the package in the list
+          return [pkgName, null]
         }
 
-        return null
+        // Skip verification if the package is already in one of the lists
+        const typesPkgName = composeTypesPackageName(pkgName)
+
+        if (packagesWithTypes.includes(pkgName)) {
+          return [pkgName, typesPkgName]
+        }
+
+        if (packagesWithoutTypes.includes(pkgName)) {
+          return [pkgName, null]
+        }
+
+        if (await isPackageOnRegistry(typesPkgName)) {
+          return [pkgName, typesPkgName]
+        }
+
+        return [pkgName, null]
       }),
     )
 
-    return typesPackages.filter(Boolean)
+    // Update the config with the verified packages
+    for (const [pkgName, typesPkg] of verifiedPackages) {
+      if (pkgName.startsWith('@types')) {
+        continue
+      }
+
+      if (typesPkg) {
+        packagesWithTypes.push(pkgName)
+      } else {
+        packagesWithoutTypes.push(pkgName)
+      }
+    }
+
+    config.set('packagesWithTypes', _.uniq(packagesWithTypes))
+    config.set('packagesWithoutTypes', _.uniq(packagesWithoutTypes))
+
+    return verifiedPackages
+      .filter(([, typesPkgName]) => Boolean(typesPkgName))
+      .map(([, typesPkgName]) => typesPkgName)
   }
 
   return []
