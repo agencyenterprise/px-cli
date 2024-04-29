@@ -11,7 +11,7 @@ const program = new Command()
 // TODO Switch to project Node.js version if defined in the `engines` property or by a `.nvmrc` file
 program
   .name('px')
-  .description('Package manager executor for JavaScript projects')
+  .description('Package manager eXecutor for JavaScript projects.')
   .version(pkgMetadata.version)
 
 program

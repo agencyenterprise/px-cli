@@ -1,14 +1,8 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
-
 import chalk from 'chalk'
 
 import { executeCommand } from '../execute-command.js'
 import { detectPackageManager } from '../utils/package-manager.js'
-import {
-  getProjectRootDirectory,
-  isTypeScriptProject,
-} from '../utils/project.js'
+import { getProjectPackageJson, isTypeScriptProject } from '../utils/project.js'
 import { composeDeclarationPackageName } from '../utils/typescript.js'
 
 /**
@@ -55,11 +49,17 @@ export async function uninstallCommand(program) {
   executeCommand(command)
 }
 
+/**
+ * List the project `dependencies` and `devDependencies`.
+ *
+ * @returns {Promise<string[]>}
+ */
 async function listProjectDependencies() {
-  const rootDir = await getProjectRootDirectory({ ignoreLockFile: true })
-  const packageJsonPath = path.join(rootDir, 'package.json')
-  const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'))
-  const { dependencies = [], devDependencies = [] } = packageJson
+  const packageJson = await getProjectPackageJson()
+  if (packageJson) {
+    const { dependencies = {}, devDependencies = {} } = packageJson
+    return [...Object.keys(dependencies), ...Object.keys(devDependencies)]
+  }
 
-  return [...Object.keys(dependencies), ...Object.keys(devDependencies)]
+  return []
 }

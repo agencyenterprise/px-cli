@@ -1,11 +1,8 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
-
 import chalk from 'chalk'
 
 import { executeCommand } from '../execute-command.js'
 import { detectPackageManager } from '../utils/package-manager.js'
-import { getProjectRootDirectory } from '../utils/project.js'
+import { getProjectPackageJson } from '../utils/project.js'
 
 /**
  * Fallback command to forward the command to the detected package manager.
@@ -36,19 +33,8 @@ export async function fallbackCommand(program) {
   executeCommand(command)
 }
 
-/**
- * @returns {Promise<string[]>}
- */
+/** @returns {Promise<string[]>} */
 async function loadProjectScripts() {
-  const rootDir = await getProjectRootDirectory({ ignoreLockFile: true })
-  if (rootDir) {
-    const packageJsonPath = path.join(rootDir, 'package.json')
-    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
-
-    if (packageJson.scripts) {
-      return Object.keys(packageJson.scripts)
-    }
-  }
-
-  return []
+  const packageJson = await getProjectPackageJson()
+  return packageJson?.scripts ? Object.keys(packageJson.scripts) : []
 }

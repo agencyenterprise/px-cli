@@ -77,3 +77,25 @@ export async function isTypeScriptProject() {
 
   return false
 }
+
+/**
+ * Get the project `package.json`.
+ *
+ * This function reads the `package.json` file from the project directory and
+ * returns the parsed JSON object. If the file is not found it returns null.
+ *
+ * On monorepos, the returned `package.json` is the first one to appear in the
+ * directory tree. If the command is being executed in a package directory, it
+ * will return the `package.json` from that directory.
+ *
+ * @returns {Promise<import('type-fest').PackageJson | null>}
+ */
+export async function getProjectPackageJson() {
+  const rootDir = await getProjectRootDirectory({ ignoreLockFile: true })
+  if (rootDir) {
+    const packageJsonPath = path.join(rootDir, 'package.json')
+    return JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
+  }
+
+  return null
+}
