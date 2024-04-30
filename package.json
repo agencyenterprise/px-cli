@@ -1,16 +1,33 @@
 {
-  "name": "pxcli",
-  "version": "0.0.1",
+  "name": "@ae-studio/px",
+  "version": "1.0.1",
   "license": "MIT",
   "type": "module",
   "main": "src/index.js",
   "bin": {
     "px": "./src/index.js"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "prepare": "husky",
     "start": "node ./src/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agencyenterprise/px-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/agencyenterprise/px-cli/issues"
+  },
+  "keywords": [
+    "cli",
+    "px",
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^12.0.0",
@@ -25,5 +42,12 @@
     "eslint-plugin-simple-import-sort": "12.1.0",
     "husky": "9.0.11",
     "type-fest": "^4.18.0"
-  }
+  },
+  "contributors": [
+    {
+      "name": "Daniel Cruz",
+      "email": "danielcunha54@gmail.com",
+      "url": "https://github.com/ddanielcruz"
+    }
+  ]
 }

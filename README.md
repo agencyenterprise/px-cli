@@ -14,7 +14,7 @@ With **px**, you no longer need to switch between package managers when working 
 ## Install
 
 ```sh
-npm install -g [PKG]
+npm install -g @ae-studio/px
 ```
 
 ## Usage
