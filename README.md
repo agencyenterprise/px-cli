@@ -1,5 +1,9 @@
 # px
 
+[![npm version](https://img.shields.io/npm/v/%40ae-studio%2Fpx)](https://www.npmjs.com/package/@ae-studio/px)
+[![npm license](https://img.shields.io/npm/l/%40ae-studio%2Fpx)](./LICENSE)
+![monthly downloads](https://img.shields.io/npm/dm/%40ae-studio%2Fpx)
+
 **px** is a CLI tool used to run commands across different JavaScript package managers.
 
 With **px**, you no longer need to switch between package managers when working on different projects. It detects the project's package manager and forwards the command for you. The command is not changed, just forwarded.
