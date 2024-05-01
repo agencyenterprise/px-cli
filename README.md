@@ -45,4 +45,4 @@ This tool is open-source and available under the MIT License. See the [LICENSE](
 
 ---
 
-Built with 🧡 by [AE Studio](https://ae.studio/join-us/)
+Built with 🧡 by [AE Studio](https://ae.studio/join-us?utm_source=sds&utm_medium=referral&utm_campaign=px-cli&utm_content=footer&utm_term=3ff5251a-e107-4d47-bfb8-b2962debd252)
