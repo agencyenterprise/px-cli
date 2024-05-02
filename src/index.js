@@ -1,10 +1,10 @@
-#!/usr/bin/env node --no-warnings=ExperimentalWarning
+#!/usr/bin/env node
 import { Command } from 'commander'
 
-import packageJson from '../package.json' with { type: 'json' }
 import { fallbackCommand } from './commands/fallback-command.js'
 import { installCommand } from './commands/install-command.js'
 import { uninstallCommand } from './commands/uninstall-command.js'
+import { packageJson } from './config.js'
 
 const program = new Command()
 

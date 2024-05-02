@@ -1,6 +1,10 @@
+import fs from 'node:fs'
+
 import Configstore from 'configstore'
 
-import packageJson from '../package.json' with { type: 'json' }
+export const packageJson = JSON.parse(
+  fs.readFileSync(new URL('../package.json', import.meta.url)),
+)
 
 export const config = new Configstore(packageJson.name, {
   /**

@@ -1,14 +1,11 @@
 {
   "name": "@ae-studio/px",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "type": "module",
   "main": "src/index.js",
   "bin": {
     "px": "./src/index.js"
-  },
-  "engines": {
-    "node": ">=20"
   },
   "scripts": {
     "prepare": "husky",
