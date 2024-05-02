@@ -17,6 +17,8 @@ With **px**, you no longer need to switch between package managers when working 
 
 ## Install
 
+Before installing **px**, ensure you have **Node.js >= 16** installed on your machine.
+
 ```sh
 npm install -g @ae-studio/px
 ```
