@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/%40ae-studio%2Fpx)](https://www.npmjs.com/package/@ae-studio/px)
 [![npm license](https://img.shields.io/npm/l/%40ae-studio%2Fpx)](./LICENSE)
-![monthly downloads](https://img.shields.io/npm/dm/%40ae-studio%2Fpx)
+[![monthly downloads](https://img.shields.io/npm/dm/%40ae-studio%2Fpx)](https://www.npmjs.com/package/@ae-studio/px)
 
 **px** is a CLI tool used to run commands across different JavaScript package managers.
 
@@ -36,7 +36,7 @@ px build         # Builds the project
 
 ## Automatic TypeScript Declarations
 
-**px** improves the experience of in TypeScript projects by making it easier to manage TypeScript declaration packages. When you install or uninstall npm packages in a TypeScript project, **px** will:
+**px** improves the experience of working in TypeScript projects by making it easier to manage TypeScript declaration packages. When you install or uninstall npm packages in a TypeScript project, **px** will:
 
 - **On install**: Automatically search for and install the corresponding TypeScript declaration packages (`@types/*`) if they exist.
 - **On uninstall**: Check for any installed declaration packages associated with the npm packages being removed and uninstall them as well.
