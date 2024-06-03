@@ -13,7 +13,7 @@ With **px**, you no longer need to switch between package managers when working 
 - Execute the same set of commands without needing to switch package managers
 - Automatically installs and uninstalls **TypeScript declaration packages** with their corresponding npm packages
 - For npm, **px** automatically adds the `run` prefix for npm scripts (e.g. `px dev` results in `npm run dev`)
-- Compatible with **npm, pnpm, and yarn**
+- Compatible with **npm, pnpm, yarn, and bun**
 
 ## Install
 

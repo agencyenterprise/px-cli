@@ -3,9 +3,9 @@ import fs from 'node:fs/promises'
 import { getProjectRootDirectory } from './project.js'
 
 /** List of lock files to determine the package manager. */
-export const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml']
+export const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb']
 
-/** @typedef {"npm" | "pnpm" | "yarn"} PackageManager */
+/** @typedef {"npm" | "pnpm" | "yarn" | "bun"} PackageManager */
 
 /**
  * Detect what is the project package manager to run the command.
@@ -32,6 +32,10 @@ export async function detectPackageManager() {
 
     if (files.includes('pnpm-lock.yaml')) {
       return 'pnpm'
+    }
+
+    if (files.includes('bun.lockb')) {
+      return 'bun'
     }
   }
 
